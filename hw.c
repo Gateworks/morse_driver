@@ -85,7 +85,12 @@ int morse_hw_irq_clear(struct morse *mors)
 
 int morse_hw_reset(int reset_pin)
 {
-	int ret = gpio_request(reset_pin, "morse-reset-ctrl");
+	int ret = 0;
+
+	if (reset_pin < 0)
+		return 0;
+
+	ret = gpio_request(reset_pin, "morse-reset-ctrl");
 
 	if (ret < 0) {
 		MORSE_PR_ERR(FEATURE_ID_DEFAULT, "Failed to acquire reset gpio. Skipping reset.\n");
