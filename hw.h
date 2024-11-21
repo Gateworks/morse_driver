@@ -97,10 +97,10 @@
 #define MORSE_INT_NDP_PROBE_REQ_PV0_VIF_MASK_ALL	(GENMASK(26, 25))
 #define MORSE_INT_NDP_PROBE_REQ_PV0_BASE_NUM		(25)
 
-#define MORSE_WAKEPIN_RPI_GPIO_DEFAULT                  (3)
-#define MORSE_ASYNC_WAKEUP_FROM_CHIP_RPI_GPIO_DEFAULT   (7)
-#define MORSE_RESETPIN_RPI_GPIO_DEFAULT                 (5)
-#define MORSE_SPI_HW_IRQ_RPI_GPIO_DEFAULT               (25)
+#define MORSE_WAKEPIN_RPI_GPIO_DEFAULT                  (-1)
+#define MORSE_ASYNC_WAKEUP_FROM_CHIP_RPI_GPIO_DEFAULT   (-1)
+#define MORSE_RESETPIN_RPI_GPIO_DEFAULT                 (-1)
+#define MORSE_SPI_HW_IRQ_RPI_GPIO_DEFAULT               (-1)
 
 /* OTP Bootrom XTAL wait bits[89:86] for MM610x */
 #define MM610X_OTP_DATA2_XTAL_WAIT_POS	GENMASK(25, 22)
@@ -289,10 +289,10 @@ struct morse_hw_cfg {
 	u32 board_type_max_value;
 	u32 fw_count;
 	u32 host_table_ptr;
-	u32 mm_reset_gpio;
-	u32 mm_wake_gpio;
-	u32 mm_ps_async_gpio;
-	u32 mm_spi_irq_gpio;
+	int mm_reset_gpio;
+	int mm_wake_gpio;
+	int mm_ps_async_gpio;
+	int mm_spi_irq_gpio;
 	u32 valid_chip_ids[];
 };
 
