@@ -1325,7 +1325,8 @@ static int morse_spi_probe(struct spi_device *spi)
 	/* setting gpio pin configs from device tree */
 	morse_of_probe(&spi->dev, mors->cfg, morse_spi_of_match);
 
-	mors->cfg->mm_ps_gpios_supported = true;
+	if (mors->cfg->mm_wake_gpio > 0 && mors->cfg->mm_ps_async_gpio > 0)
+		mors->cfg->mm_ps_gpios_supported = true;
 	ret = morse_spi_reg32_read(mors, MORSE_REG_CHIP_ID(mors), &mors->chip_id);
 	if (ret) {
 		MORSE_SPI_ERR(mors, "failed to read chip id: %d\n", ret);

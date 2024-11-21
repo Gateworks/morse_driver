@@ -244,7 +244,7 @@ int morse_ps_disable(struct morse *mors)
 int morse_ps_init(struct morse *mors, bool enable, bool enable_dynamic_ps)
 {
 	int ret;
-	int irq = gpio_to_irq(mors->cfg->mm_ps_async_gpio);
+	int irq = mors->cfg->mm_ps_async_gpio < 0 ? -1 : gpio_to_irq(mors->cfg->mm_ps_async_gpio);
 	struct morse_ps *mps = &mors->ps;
 
 	mps->enable = enable;

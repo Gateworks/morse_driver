@@ -749,7 +749,8 @@ static int morse_sdio_probe(struct sdio_func *func, const struct sdio_device_id 
 	/* setting gpio pin configs from device tree */
 	morse_of_probe(dev, mors->cfg, morse_of_match_table);
 
-	mors->cfg->mm_ps_gpios_supported = true;
+	if (mors->cfg->mm_wake_gpio > 0 && mors->cfg->mm_ps_async_gpio > 0)
+		mors->cfg->mm_ps_gpios_supported = true;
 
 	/* Digital reset the chip now if external (host) xtal initialisation is required */
 	if (enable_ext_xtal_init) {
