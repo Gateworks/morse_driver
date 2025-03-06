@@ -394,6 +394,10 @@ static int morse_firmware_trigger(struct morse *mors)
 
 	morse_reg32_write(mors, MORSE_REG_MSI(mors), MORSE_REG_MSI_HOST_INT(mors));
 	morse_release_bus(mors);
+
+	/* allow some time for the firmware to recover before bus access */
+	usleep_range(500, 1000);
+
 	return 0;
 }
 
