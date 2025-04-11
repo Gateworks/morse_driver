@@ -124,7 +124,7 @@ void morse_ps_bus_activity(struct morse *mors, int timeout_ms)
 	mutex_unlock(&mors->ps.lock);
 }
 
-int __morse_ps_evaluate(struct morse_ps *mps)
+static int __morse_ps_evaluate(struct morse_ps *mps)
 {
 	struct morse *mors = container_of(mps, struct morse, ps);
 	bool needs_wake = false;

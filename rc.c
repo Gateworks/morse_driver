@@ -702,7 +702,7 @@ exit:
 	}
 
 	rcu_read_unlock();
-	ieee80211_tx_status(mors->hw, skb);
+	ieee80211_tx_status_skb(mors->hw, skb);
 }
 
 void morse_rc_sta_state_check(struct morse *mors,

@@ -1177,7 +1177,7 @@ static void morse_skbq_tx_status_fill(struct morse *mors,
 		txi->status.ampdu_ack_len = txi->flags & IEEE80211_TX_STAT_ACK ? 1 : 0;
 	}
 
-	ieee80211_tx_status(mors->hw, skb);
+	ieee80211_tx_status_skb(mors->hw, skb);
 }
 #endif /* CONFIG_MORSE_RC */
 

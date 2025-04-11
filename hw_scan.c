@@ -730,7 +730,7 @@ exit:
 	cancel_delayed_work_sync(&mors->hw_scan.timeout);
 }
 
-void morse_hw_scan_timeout_work(struct work_struct *work)
+static void morse_hw_scan_timeout_work(struct work_struct *work)
 {
 	struct morse *mors = container_of(work, struct morse, hw_scan.timeout.work);
 

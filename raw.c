@@ -255,7 +255,7 @@ struct morse_raw_periodic_t {
  *
  * @return: allocated AID list
  */
-struct morse_aid_list *morse_generate_aid_list(unsigned long *aid_bitmap, int num_aids,
+static struct morse_aid_list *morse_generate_aid_list(unsigned long *aid_bitmap, int num_aids,
 	int max_aid, int gfp)
 {
 	int aid;
@@ -1133,7 +1133,7 @@ struct morse_raw_config *morse_raw_create_or_find_by_id(struct morse_raw *raw, u
 	return config;
 }
 
-void morse_raw_delete_config(struct morse_raw_config *config)
+static void morse_raw_delete_config(struct morse_raw_config *config)
 {
 	morse_raw_deactivate_config(config);
 	list_del(&config->list);

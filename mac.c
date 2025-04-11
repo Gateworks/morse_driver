@@ -964,7 +964,7 @@ static bool morse_mac_tx_ps_filtered_for_sta(struct morse *mors,
 	info->flags |= IEEE80211_TX_STAT_TX_FILTERED;
 	info->flags &= ~IEEE80211_TX_CTL_AMPDU;
 
-	ieee80211_tx_status(mors->hw, skb);
+	ieee80211_tx_status_skb(mors->hw, skb);
 	return true;
 }
 
@@ -1623,7 +1623,7 @@ u64 morse_mac_generate_timestamp_for_frame(struct morse_vif *mors_vif)
 	return jiffies_to_usecs(get_jiffies_64() - mors_vif->epoch);
 }
 
-int morse_mac_mgmt_pkt_to_s1g(struct morse *mors, struct sk_buff **skb_orig, int *tx_bw_mhz)
+static int morse_mac_mgmt_pkt_to_s1g(struct morse *mors, struct sk_buff **skb_orig, int *tx_bw_mhz)
 {
 	int s1g_ies_length;
 	struct dot11ah_ies_mask *ies_mask = NULL;
@@ -2131,7 +2131,7 @@ int morse_survey_add_channel_usage(struct morse *mors, struct morse_survey_rx_us
 	return ret;
 }
 
-int morse_survey_update_channel_usage(struct morse *mors)
+static int morse_survey_update_channel_usage(struct morse *mors)
 {
 	struct morse_channel_survey *survey = mors->channel_survey;
 	struct morse_survey_rx_usage_record usage_record;
@@ -2244,7 +2244,7 @@ static int morse_mac_ops_start(struct ieee80211_hw *hw)
 	return 0;
 }
 
-static void morse_mac_ops_stop(struct ieee80211_hw *hw)
+static void morse_mac_ops_stop(struct ieee80211_hw *hw, bool suspend)
 {
 	struct morse *mors = hw->priv;
 	struct morse_vif *mon_if = &mors->mon_if;
@@ -2379,7 +2379,7 @@ static void morse_chswitch_timer(struct timer_list *t)
 	MORSE_ECSA_INFO(mors, "%s: chswitch timer TS=%ld\n", __func__, jiffies);
 
 	if (vif->type == NL80211_IFTYPE_AP)
-		ieee80211_csa_finish(vif);
+		ieee80211_csa_finish(vif, 0);
 }
 
 static void morse_ecsa_chswitch_work(struct work_struct *work)
@@ -2909,7 +2909,7 @@ exit:
 	mutex_unlock(&mors->lock);
 }
 
-s32 morse_mac_get_max_txpower(struct morse *mors)
+static s32 morse_mac_get_max_txpower(struct morse *mors)
 {
 	int ret;
 	s32 power_mbm;
@@ -2954,7 +2954,7 @@ s32 morse_mac_set_txpower(struct morse *mors, s32 power_mbm)
 	return mors->tx_power_mbm;
 }
 
-int set_duty_cycle(struct morse *mors, const struct morse_reg_rule *mors_reg_rule, bool have_ap)
+static int set_duty_cycle(struct morse *mors, const struct morse_reg_rule *mors_reg_rule, bool have_ap)
 {
 	int ret = 0;
 	u32 duty_cycle;
@@ -3260,7 +3260,7 @@ static int morse_mac_ops_get_txpower(struct ieee80211_hw *hw, struct ieee80211_v
 
 	err = !chanctx_conf;
 
-	if (err || !cfg80211_chandef_identical(&vif->bss_conf.chandef, &hw->conf.chandef))
+	if (err || !cfg80211_chandef_identical(&vif->bss_conf.chanreq.oper, &hw->conf.chandef))
 		return -ENODATA;
 
 	mutex_lock(&mors->lock);
@@ -4488,7 +4488,7 @@ static int morse_mac_join_ibss(struct ieee80211_hw *hw, struct ieee80211_vif *vi
 {
 	struct morse *mors = hw->priv;
 	const struct morse_dot11ah_channel *chan_s1g =
-	    morse_dot11ah_channel_chandef_to_s1g(&vif->bss_conf.chandef);
+	    morse_dot11ah_channel_chandef_to_s1g(&vif->bss_conf.chanreq.oper);
 	struct morse_vif *mors_vif = (struct morse_vif *)vif->drv_priv;
 	u8 bssid[ETH_ALEN], fc_bss_bw_subfield = 0;
 	bool ibss_creator = morse_mac_is_ibss_creator(vif);
@@ -4514,8 +4514,8 @@ static int morse_mac_join_ibss(struct ieee80211_hw *hw, struct ieee80211_vif *vi
 #endif
 		   vif->bss_conf.bssid,
 		   vif->addr,
-		   vif->bss_conf.chandef.chan->hw_value,
-		   vif->bss_conf.chandef.chan->center_freq,
+		   vif->bss_conf.chanreq.oper.chan->hw_value,
+		   vif->bss_conf.chanreq.oper.chan->center_freq,
 		   chan_s1g ? chan_s1g->ch.hw_value : -1,
 		   chan_s1g ? ieee80211_channel_to_khz(&chan_s1g->ch) : -1,
 		   op_bw_mhz,
@@ -4722,7 +4722,10 @@ static struct ieee80211_ops mors_ops = {
 	.sta_statistics = morse_sta_tx_rate_stats,
 	.get_expected_throughput = morse_get_expected_throughput,
 #endif
-
+	.add_chanctx = ieee80211_emulate_add_chanctx,
+	.remove_chanctx = ieee80211_emulate_remove_chanctx,
+	.change_chanctx = ieee80211_emulate_change_chanctx,
+	.switch_vif_chanctx = ieee80211_emulate_switch_vif_chanctx,
 };
 
 int morse_mac_send_vendor_wake_action_frame(struct morse *mors, const u8 *dest_addr,
@@ -4790,7 +4793,7 @@ int morse_mac_send_vendor_wake_action_frame(struct morse *mors, const u8 *dest_a
 	info = IEEE80211_SKB_CB(skb);
 	info->control.vif = vif;
 	info->flags |= IEEE80211_TX_STAT_TX_FILTERED;
-	ieee80211_tx_status(mors->hw, skb);
+	ieee80211_tx_status_skb(mors->hw, skb);
 
 	return 0;
 
@@ -4819,7 +4822,7 @@ void morse_mac_send_buffered_bc(struct ieee80211_vif *vif)
 	}
 }
 
-u8 morse_mac_get_rx_s1g_bw_mhz(struct morse_skb_rx_status *hdr_rx_status)
+static u8 morse_mac_get_rx_s1g_bw_mhz(struct morse_skb_rx_status *hdr_rx_status)
 {
 	enum dot11_bandwidth bw_idx = morse_ratecode_bw_index_get(hdr_rx_status->morse_ratecode);
 
@@ -5074,7 +5077,7 @@ void morse_mac_ecsa_beacon_tx_done(struct morse *mors, struct sk_buff *skb)
 
 	if (morse_mac_is_csa_active(vif) && morse_mac_is_s1g_long_beacon(mors, skb)) {
 #if KERNEL_VERSION(5, 10, 0) < MAC80211_VERSION_CODE
-		if (ieee80211_beacon_cntdwn_is_complete(vif)) {
+		if (ieee80211_beacon_cntdwn_is_complete(vif, 0)) {
 #else
 		if (ieee80211_csa_is_complete(vif)) {
 #endif
@@ -6165,7 +6168,7 @@ err:
 	return ret;
 }
 
-void morse_reg_notifier(struct wiphy *wiphy, struct regulatory_request *request)
+static void morse_reg_notifier(struct wiphy *wiphy, struct regulatory_request *request)
 {
 	struct morse *mors = morse_wiphy_to_morse(wiphy);
 	char *req_cc;
@@ -6489,7 +6492,7 @@ err_init:
 	return ret;
 }
 
-struct morse *morse_ieee80211_create(size_t priv_size, struct device *dev)
+static struct morse *morse_ieee80211_create(size_t priv_size, struct device *dev)
 {
 	struct ieee80211_hw *hw;
 	struct morse *mors;

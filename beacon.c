@@ -391,7 +391,7 @@ static void morse_beacon_tasklet(unsigned long data)
 		}
 
 		/* Just say we transmitted it */
-		ieee80211_tx_status(mors->hw, beacon);
+		ieee80211_tx_status_skb(mors->hw, beacon);
 		beacon = skb2;
 	}
 
@@ -457,7 +457,7 @@ void morse_beacon_irq_handle(struct morse *mors, u32 status)
 	spin_unlock_bh(&mors->vif_list_lock);
 }
 
-int morse_beacon_irq_enable(struct morse_vif *mors_vif, bool enable)
+static int morse_beacon_irq_enable(struct morse_vif *mors_vif, bool enable)
 {
 	struct morse *mors = morse_vif_to_morse(mors_vif);
 	u8 beacon_irq_num = MORSE_INT_BEACON_BASE_NUM + mors_vif->id;

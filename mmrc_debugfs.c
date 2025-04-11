@@ -19,12 +19,13 @@
 
 #include <linux/types.h>
 #include <linux/debugfs.h>
+#include "debug.h"
 #include "morse.h"
 #include "mac.h"
 #include "rc.h"
 #include "mmrc-submodule/src/core/mmrc.h"
 
-void morse_print_station_stats(struct morse_sta *msta, struct seq_file *file)
+static void morse_print_station_stats(struct morse_sta *msta, struct seq_file *file)
 {
 	u32 last_tx_rate_kbps;
 	u32 last_rx_rate_kbps;
@@ -291,7 +292,6 @@ static ssize_t set_fixed_rate(struct file *file, const char __user *user_buf,
 
 static const struct file_operations mmrc_fixed_rate = {
 	.open = simple_open,
-	.llseek = no_llseek,
 	.write = set_fixed_rate,
 };
 

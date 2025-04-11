@@ -57,7 +57,7 @@ static int pageset_lock(struct morse_pageset *pageset)
 	return 0;
 }
 
-void pageset_unlock(struct morse_pageset *pageset)
+static void pageset_unlock(struct morse_pageset *pageset)
 {
 	clear_bit_unlock(0, &pageset->access_lock);
 }
@@ -346,7 +346,7 @@ static bool morse_pageset_rsved_page_is_avail(struct morse_pageset *pageset, u8 
 	return 0;
 }
 
-int morse_pageset_write(struct morse_pageset *pageset, struct sk_buff *skb)
+static int morse_pageset_write(struct morse_pageset *pageset, struct sk_buff *skb)
 {
 	int ret = 0;
 	bool from_rsvd = false;
@@ -418,7 +418,7 @@ exit:
 	return ret;
 }
 
-int morse_pageset_read(struct morse_pageset *pageset)
+static int morse_pageset_read(struct morse_pageset *pageset)
 {
 	int ret = 0;
 	struct morse *mors = pageset->mors;

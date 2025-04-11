@@ -329,7 +329,7 @@ exit:
 	return ret;
 }
 
-void morse_sdio_claim_host(struct morse *mors)
+static void morse_sdio_claim_host(struct morse *mors)
 {
 	struct morse_sdio *sdio = (struct morse_sdio *)mors->drv_priv;
 	struct sdio_func *func = sdio->func;
@@ -337,7 +337,7 @@ void morse_sdio_claim_host(struct morse *mors)
 	sdio_claim_host(func);
 }
 
-void morse_sdio_release_host(struct morse *mors)
+static void morse_sdio_release_host(struct morse *mors)
 {
 	struct morse_sdio *sdio = (struct morse_sdio *)mors->drv_priv;
 	struct sdio_func *func = sdio->func;

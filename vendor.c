@@ -367,7 +367,7 @@ int morse_vendor_get_ie_len_for_pkt(struct sk_buff *pkt, int oui_type)
 	return sizeof(struct dot11_morse_vendor_caps_ops_ie) + 2;
 }
 
-int morse_vendor_send_bcn_vendor_ie_found_event(struct ieee80211_vif *vif,
+static int morse_vendor_send_bcn_vendor_ie_found_event(struct ieee80211_vif *vif,
 						struct ieee80211_vendor_ie *vie)
 {
 	struct wireless_dev *wdev = ieee80211_vif_to_wdev(vif);
