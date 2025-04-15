@@ -8,7 +8,8 @@ DEBFLAGS = -O2
 endif
 
 # Set 0 to a version number. This is done to match the Linux expectations
-override MORSE_VERSION = "0-rel_1_16_4_2025_Sep_18"
+#override MORSE_VERSION = "0-rel_1_16_4_2025_Sep_18"
+MORSE_VERSION ?= "v1.16.4-g$(shell git rev-parse --verify HEAD 2>/dev/null | cut -c1-12)"
 
 #ccflags-y += $(DEBFLAGS) -Werror
 ccflags-y += "-DMORSE_VERSION=$(MORSE_VERSION)"
