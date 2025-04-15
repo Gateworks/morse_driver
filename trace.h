@@ -36,8 +36,13 @@ DECLARE_EVENT_CLASS(morse_log_event,
 			 dev_name(mors->dev))
 			 __string(driver, dev_driver_string(mors->dev))
 			 __dynamic_array(char, msg, MORSE_MSG_MAX)),
+#if KERNEL_VERSION(6, 10, 0) > LINUX_VERSION_CODE
+	TP_fast_assign(__assign_str(device, dev_name(mors->dev));
+		       __assign_str(driver, dev_driver_string(mors->dev));
+#else
 	TP_fast_assign(__assign_str(device);
 		       __assign_str(driver);
+#endif
 		       WARN_ON_ONCE(vsnprintf(__get_dynamic_array(msg),
 					      MORSE_MSG_MAX,
 					      vaf->fmt, *vaf->va) >= MORSE_MSG_MAX);),

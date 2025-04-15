@@ -702,7 +702,11 @@ exit:
 	}
 
 	rcu_read_unlock();
+#if KERNEL_VERSION(6, 7, 0) > MAC80211_VERSION_CODE
+	ieee80211_tx_status(mors->hw, skb);
+#else
 	ieee80211_tx_status_skb(mors->hw, skb);
+#endif
 }
 
 void morse_rc_sta_state_check(struct morse *mors,

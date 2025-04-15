@@ -391,7 +391,11 @@ static void morse_beacon_tasklet(unsigned long data)
 		}
 
 		/* Just say we transmitted it */
+#if KERNEL_VERSION(6, 7, 0) > MAC80211_VERSION_CODE
+		ieee80211_tx_status(mors->hw, beacon);
+#else
 		ieee80211_tx_status_skb(mors->hw, beacon);
+#endif
 		beacon = skb2;
 	}
 
