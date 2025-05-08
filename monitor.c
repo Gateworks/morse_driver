@@ -22,6 +22,7 @@
 #include <linux/if_arp.h>
 #include <linux/rtnetlink.h>
 
+#include "monitor.h"
 #include "morse.h"
 #include "debug.h"
 #include "mac.h"

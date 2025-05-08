@@ -21,6 +21,9 @@
  */
 #include <net/mac80211.h>
 
+#include "command.h"
+#include "morse.h"
+
 int morse_mon_init(struct morse *mors);
 
 void morse_mon_free(struct morse *mors);
