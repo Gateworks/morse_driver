@@ -870,7 +870,7 @@ static uint32_t binary_crc(const struct firmware *fw)
 	return ~crc32_le(~0, (unsigned char const *)fw->data, fw->size) & 0xffffffff;
 }
 
-int morse_firmware_init(struct morse *mors, enum morse_config_test_mode test_mode)
+int morse_firmware_init(struct morse *mors, int test_mode)
 {
 	int n;
 	int ret = 0;

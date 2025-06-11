@@ -645,7 +645,7 @@ static int morse_pageset_num_pages(struct morse_pageset *pageset, struct sk_buff
 static void morse_pageset_tx(struct morse_pageset *pageset, struct morse_skbq *mq)
 {
 	int ret = 0;
-	int num_pages;
+	int num_pages = 0;
 	int num_items = 0;
 	struct sk_buff *skb;
 	struct sk_buff_head skbq_to_send;
