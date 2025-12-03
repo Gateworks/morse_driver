@@ -815,16 +815,6 @@ static int morse_sdio_probe(struct sdio_func *func, const struct sdio_device_id 
 		goto err_exit;
 	}
 
-	/* Verify the above chip_id matches the one read directly from the chip */
-	morse_claim_bus(mors);
-	ret = morse_reg32_read(mors, MORSE_REG_CHIP_ID(mors), &chip_id);
-	morse_release_bus(mors);
-	if (ret || chip_id != mors->chip_id) {
-		MORSE_SDIO_ERR(mors, "Chip ID read failed: %d\n", ret);
-		goto err_exit;
-	}
-	MORSE_SDIO_INFO(mors, "Morse Micro SDIO device found, chip ID=0x%04x\n", mors->chip_id);
-
 	/* setting gpio pin configs from device tree */
 	if (morse_of_probe(dev, mors->cfg, morse_of_match_table) < 0)
 		goto err_exit;
@@ -834,6 +824,16 @@ static int morse_sdio_probe(struct sdio_func *func, const struct sdio_device_id 
 		MORSE_DBG(mors, "Resetting chip early for external xtal init");
 		mors->cfg->digital_reset(mors);
 	}
+
+	/* Verify the above chip_id matches the one read directly from the chip */
+	morse_claim_bus(mors);
+	ret = morse_reg32_read(mors, MORSE_REG_CHIP_ID(mors), &chip_id);
+	morse_release_bus(mors);
+	if (ret || chip_id != mors->chip_id) {
+		MORSE_SDIO_ERR(mors, "Chip ID read failed: %d\n", ret);
+		goto err_exit;
+	}
+	MORSE_SDIO_INFO(mors, "Morse Micro SDIO device found, chip ID=0x%04x\n", mors->chip_id);
 
 	morse_sdio_config_burst_mode(mors, true);
 
