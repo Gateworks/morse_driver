@@ -817,7 +817,13 @@ static int morse_sdio_probe(struct sdio_func *func, const struct sdio_device_id 
 
 	/* setting gpio pin configs from device tree */
 	if (morse_of_probe(dev, mors->cfg, morse_of_match_table) < 0)
+	{
+#if 0
 		goto err_exit;
+#else
+		mors->cfg->mm_reset_gpio = -1;
+#endif
+	}
 
 	/* Digital reset the chip now if external (host) xtal initialisation is required */
 	if (enable_ext_xtal_init) {
