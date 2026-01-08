@@ -182,14 +182,18 @@ static void morse_yaps_fill_aux_data_from_hw_tbl(struct morse_yaps_hw_aux_data *
 static inline u8 morse_yaps_crc(u32 word)
 {
 	u8 crc = 0;
-	int len = sizeof(word);
+	u8 buf[4];
 
 	/* Mask to look at only non-crc bits in both metadata word and delimiters */
-	word &= 0x1ffffff;
-	while (len--) {
-		crc = crc7_be_byte(crc, (word >> 24) & 0xff);
-		word <<= 8;
-	}
+	word &= word & 0x1ffffff;
+
+	buf[0] = (word >> 24) & 0xff;
+        buf[1] = (word >> 16) & 0xff;
+        buf[2] = (word >> 8) & 0xff;
+        buf[3] = word & 0xff;
+
+	crc = crc7_be(crc, buf, sizeof(buf));
+
 	return crc >> 1;
 }
 
