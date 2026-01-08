@@ -3470,7 +3470,11 @@ static int morse_mac_change_channel(struct ieee80211_hw *hw)
 	return ret;
 }
 
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 17, 0)
+static int morse_mac_ops_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
+#else
 static int morse_mac_ops_config(struct ieee80211_hw *hw, u32 changed)
+#endif
 {
 	int err = 0;
 	struct morse *mors = hw->priv;
@@ -3540,7 +3544,11 @@ exit:
 }
 
 /* Return Tx power only when channel is configured and is the same as one in hw->conf */
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 14, 0)
+static int morse_mac_ops_get_txpower(struct ieee80211_hw *hw, struct ieee80211_vif *vif, unsigned int link_id, int *dbm)
+#else
 static int morse_mac_ops_get_txpower(struct ieee80211_hw *hw, struct ieee80211_vif *vif, int *dbm)
+#endif
 {
 	int err;
 	struct morse *mors = hw->priv;
@@ -4891,7 +4899,11 @@ static int morse_mac_join_ibss(struct ieee80211_hw *hw, struct ieee80211_vif *vi
 		 * packets.
 		 */
 		changed |= IEEE80211_CONF_CHANGE_CHANNEL;
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 14, 0)
+		morse_mac_ops_config(hw, 0, changed);
+#else
 		morse_mac_ops_config(hw, changed);
+#endif
 	}
 
 	memcpy(bssid, vif->bss_conf.bssid, ETH_ALEN);
@@ -4927,7 +4939,11 @@ static void morse_mac_leave_ibss(struct ieee80211_hw *hw, struct ieee80211_vif *
 	mutex_unlock(&mors->lock);
 }
 
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 17, 0)
+static int morse_mac_set_frag_threshold(struct ieee80211_hw *hw, int radio_idx, u32 value)
+#else
 static int morse_mac_set_frag_threshold(struct ieee80211_hw *hw, u32 value)
+#endif
 {
 	int ret = -EINVAL;
 	struct morse *mors = hw->priv;
@@ -4941,7 +4957,11 @@ static int morse_mac_set_frag_threshold(struct ieee80211_hw *hw, u32 value)
 	return ret;
 }
 
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 17, 0)
+static int morse_mac_set_rts_threshold(struct ieee80211_hw *hw, int radio_idx, u32 value)
+#else
 static int morse_mac_set_rts_threshold(struct ieee80211_hw *hw, u32 value)
+#endif
 {
 	/* When Minstrel is not used, Linux checks if .set_rts_threshold is registered.
 	 * MMRC follows Minstrel to apply RTS on retry rates so does not use this function.
