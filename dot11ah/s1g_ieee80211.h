@@ -296,4 +296,32 @@ static inline int ieee80211_is_s1g_short_beacon_local(__le16 fc)
 		((fc & cpu_to_le16(IEEE80211_FCTL_COMPR_SSID)) != 0));
 }
 
+/* These were removed from 6.18 but the bits are still available */
+#if MAC80211_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+/**
+ * enum morse_dot11ah_channel_flags - channel flags
+ *
+ * These are in Linux 5.10, should be disabled
+ *
+ * @IEEE80211_CHAN_1MHZ: 1 MHz bandwidth is permitted
+ *	on this channel.
+ * @IEEE80211_CHAN_2MHZ: 2 MHz bandwidth is permitted
+ *	on this channel.
+ * @IEEE80211_CHAN_4MHZ: 4 MHz bandwidth is permitted
+ *	on this channel.
+ * @IEEE80211_CHAN_8MHZ: 8 MHz bandwidth is permitted
+ *	on this channel.
+ * @IEEE80211_CHAN_16MHZ: 16 MHz bandwidth is permitted
+ *	on this channel.
+ *
+ */
+enum morse_dot11ah_channel_flags {
+	IEEE80211_CHAN_1MHZ		= BIT(14),
+	IEEE80211_CHAN_2MHZ		= BIT(15),
+	IEEE80211_CHAN_4MHZ		= BIT(16),
+	IEEE80211_CHAN_8MHZ		= BIT(17),
+	IEEE80211_CHAN_16MHZ		= BIT(18),
+};
+#endif
+
 #endif  /* !_IEEE80211_H_ */
