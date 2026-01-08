@@ -285,9 +285,50 @@ void morse_unii4_band_chan_to_op_class(struct cfg80211_chan_def *chandef, u8 *op
  * of next TBTT bit in frame control, whereas compressed SSID is more acccurate
  * flag to check if it's a short beacon. For now we will use below function.
  */
+#define IEEE80211_FCTL_NEXT_TBBT	0x0100
 #define IEEE80211_FCTL_COMPR_SSID	0x0200
+#define IEEE80211_FCTL_ANO		0x0400
+
+/**
+ * ieee80211_s1g_optional_len - determine length of optional S1G beacon fields
+ * @fc: frame control bytes in little-endian byteorder
+ * Return: total length in bytes of the optional fixed-length fields
+ *
+ * S1G beacons may contain up to three optional fixed-length fields that
+ * precede the variable-length elements. Whether these fields are present
+ * is indicated by flags in the frame control field.
+ *
+ * From IEEE 802.11-2024 section 9.3.4.3:
+ *  - Next TBTT field may be 0 or 3 bytes
+ *  - Short SSID field may be 0 or 4 bytes
+ *  - Access Network Options (ANO) field may be 0 or 1 byte
+ */
+static inline size_t
+ieee80211_s1g_optional_len_local(__le16 fc)
+{
+	size_t len = 0;
+
+	if (fc & cpu_to_le16(IEEE80211_FCTL_NEXT_TBBT))
+		len += 3;
+
+	if (fc & cpu_to_le16(IEEE80211_FCTL_COMPR_SSID))
+		len += 4;
+
+	if (fc & cpu_to_le16(IEEE80211_FCTL_ANO))
+		len += 1;
+
+	return len;
+}
+
 /**
  * ieee80211_is_s1g_short_beacon_local - check if type is S1G Beacon is short beacon
+ * kernel before 'wifi: mac80211: correctly identify S1G short beacon'
+ * would return true if 'next TBTT' was set. After the patch it would consider
+ * a short beacon as any beacon with no elements or if the first element
+ * was a beacon compatibility element
+ *
+ * We will use the presence of a compressed ssid regardless of kernel version
+ *
  * @fc: frame control bytes in little-endian byteorder
  */
 static inline int ieee80211_is_s1g_short_beacon_local(__le16 fc)
