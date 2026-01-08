@@ -86,3 +86,10 @@ static inline u8 ieee80211_get_tid(struct ieee80211_hdr *hdr)
 }
 #endif
 #define MORSE_IEEE80211_GET_TID(_hdr) ieee80211_get_tid(_hdr)
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+#define del_timer_sync	timer_delete_sync
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 16, 0)
+#define from_timer(x,y,z)	timer_container_of(x,y,z)
+#endif
