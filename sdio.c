@@ -886,11 +886,10 @@ static int morse_sdio_probe(struct sdio_func *func, const struct sdio_device_id 
 	MORSE_SDIO_INFO(mors, "Morse Micro SDIO device found, chip ID=0x%04x\n", mors->chip_id);
 
 	/* setting gpio pin configs from device tree */
-	if (morse_of_probe(dev, &gpios, morse_of_match_table) < 0)
-		goto err_exit;
-
-	mors->cfg->gpios = gpios;
-	reset_gpio = gpios.reset;
+	if (!morse_of_probe(dev, &gpios, morse_of_match_table)) {
+		mors->cfg->gpios = gpios;
+		reset_gpio = gpios.reset;
+	}
 
 	morse_sdio_config_burst_mode(mors, false);
 
